@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Item Manager</title>
+	<link rel="stylesheet" type="text/css" href="https://bootswatch.com/4/superhero/bootstrap.min.css">
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+  <a class="navbar-brand" href="#">Item Manager</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarColor01" aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div class="collapse navbar-collapse" id="navbarColor01">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item active">
+        <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="#">Features</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="#">Pricing</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="#">About</a>
+      </li>
+    </ul>
+    <form class="form-inline my-2 my-lg-0">
+      <input class="form-control mr-sm-2" type="text" placeholder="Search">
+      <button class="btn btn-secondary my-2 my-sm-0" type="submit">Search</button>
+    </form>
+  </div>
+</nav>
+
+<div class="container">
+  <h1>Add Item</h1>
+  <form id="itemForm">
+    <div class="form-group">
+      <label>Text</label>
+      <input type="text" id="text" class="form-control">
+    </div>
+    <div class="form-group">
+      <label>Body</label>
+      <textarea id="body" class="form-control"></textarea>
+    </div>
+    <input type="submit" name="" value="Submit" class="btn btn-primary">
+  </form>
+  <hr>
+	<ul id="items" class="list-group"></ul>
+</div>
+
+      <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <script
+  src="https://code.jquery.com/jquery-3.2.1.min.js"
+  integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+  crossorigin="anonymous"></script>
+   
+   
+
+
+<script type="text/javascript">
+	$(document).ready(function(){
+		getItems();
+
+		//Get Items from API
+		function getItems(){
+			$.ajax({
+				url : 'http://itemapi.san/api/items'
+			}).done(function(items){
+				let output = '';
+				$.each(items, function(key, item){
+					output += '<li class="list-group-item"><strong>'+item.text+' : </strong>'+item.body+
+          '<a href="#" class="delete-link" data-id='+item.id+'> | Delete</a></li>';
+				});
+				$('#items').append(output);
+			});
+		}
+
+    //Submit Event
+    $('#itemForm').on('submit', function(e){
+        e.preventDefault();
+
+        let text = $('#text').val();
+        let body = $('#body').val();
+
+        addItem(text, body);
+    });
+
+    //Add Item atau Insert using API
+    function addItem(text, body){
+      $.ajax({
+        method : 'POST',
+        url : 'http://itemapi.san/api/items',
+        data : {text: text , body : body}
+      }).done(function(item){
+          alert('Item # '+item.id+' added');
+          location.reload();
+      });
+    }
+
+
+  //Delete Item
+  function deleteItem(id){
+      $.ajax({
+        method : 'POST',
+        url : 'http://itemapi.san/api/items/'+id,
+        data : {_method: 'DELETE'}
+      }).done(function(item){
+        alert('Item Removed');
+        location.reload();
+      });
+  }
+
+    //Delete Event
+    $('body').on('click', '.delete-link', function(e){
+      e.preventDefault;
+
+      let id = $(this).data('id');
+
+      deleteItem(id);
+    });
+
+
+	});
+</script>
+
+</body>
+</html>
